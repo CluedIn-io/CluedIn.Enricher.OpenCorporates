@@ -14,15 +14,18 @@ using System.Net;
 using CluedIn.Core;
 using CluedIn.Core.Data;
 using CluedIn.Core.Data.Parts;
-
+using CluedIn.Core.Data.Relational;
+using CluedIn.Core.ExternalSearch;
+using CluedIn.Core.Providers;
 using RestSharp;
 using CluedIn.ExternalSearch.Providers.OpenCorporates.Model;
 using CluedIn.ExternalSearch.Providers.OpenCorporates.Vocabularies;
 using CluedIn.Crawling.Helpers;
+using EntityType = CluedIn.Core.Data.EntityType;
 
 namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 {
-    public class OpenCorporatesExternalSearchProvider : ExternalSearchProviderBase
+    public class OpenCorporatesExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata
     {
         /**********************************************************************************************************
          * CONSTRUCTORS
@@ -300,5 +303,13 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
             metadata.Codes.Add(code);
         }
-    }
+
+        public string Icon { get; } = "Resources.cluedin.png";
+        public string Domain { get; } = "To be confirmed";
+        public string About { get; } = "A test Enricher used to work with known data during acceptance tests";
+        public AuthMethods AuthMethods { get; }
+        public IEnumerable<Control> Properties { get; }
+        public Guide Guide { get; }
+        public IntegrationType Type { get; } = IntegrationType.Cloud;
+	}
 }
