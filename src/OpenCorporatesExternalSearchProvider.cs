@@ -304,9 +304,9 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             metadata.Codes.Add(code);
         }
 
-        public string Icon { get; } = "Resources.cluedin.png";
-        public string Domain { get; } = "To be confirmed";
-        public string About { get; } = "A test Enricher used to work with known data during acceptance tests";
+        public string Icon { get; } = "Resources.opencorporates.png";
+        public string Domain { get; } = "https://opencorporates.com/";
+        public string About { get; } = "Open corporates is an enricher which allows for search on all worldwide companies and their information";
         public AuthMethods AuthMethods { get; }
         public IEnumerable<Control> Properties { get; }
         public Guide Guide { get; }

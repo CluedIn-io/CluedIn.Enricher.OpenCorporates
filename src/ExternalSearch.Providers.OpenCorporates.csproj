@@ -18,10 +18,10 @@
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Resources\cluedin.png" />
+    <None Remove="Resources\opencorporates.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\cluedin.png" />
+    <EmbeddedResource Include="Resources\opencorporates.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="domainname-parser" Version="999.1.15" />
