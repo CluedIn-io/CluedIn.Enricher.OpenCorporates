@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <ProjectGuid>{E5832F12-6BB8-4ACA-AB23-F82888FF3971}</ProjectGuid>
     <RootNamespace>CluedIn.ExternalSearch.Providers.OpenCorporates</RootNamespace>
@@ -12,10 +12,17 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
   </PropertyGroup>
+  <ItemGroup>
+    <None Remove="Resources\opencorporates.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\opencorporates.png" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="domainname-parser" Version="999.1.15" />
     <PackageReference Include="EntityFramework" Version="6.1.2" />
@@ -30,7 +37,7 @@
   </ItemGroup>
    <ItemGroup>
     <PackageReference Include="CluedIn.ExternalSearch">
-      <Version>2.4.0-alpha0089</Version>
+      <Version>2.6.0-alpha0003</Version>
     </PackageReference>
     <PackageReference Include="MediaToolkit">
       <Version>1.1.0.1</Version>
