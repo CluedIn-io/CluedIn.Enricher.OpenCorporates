@@ -21,6 +21,7 @@ using RestSharp;
 using CluedIn.ExternalSearch.Providers.OpenCorporates.Model;
 using CluedIn.ExternalSearch.Providers.OpenCorporates.Vocabularies;
 using CluedIn.Crawling.Helpers;
+using Microsoft.Extensions.Logging;
 using EntityType = CluedIn.Core.Data.EntityType;
 
 namespace CluedIn.ExternalSearch.Providers.OpenCorporates
@@ -92,13 +93,13 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 yield break;
 
             var client = new RestClient("https://api.opencorporates.com/v0.4");
-            client.AddHandler("application/json", NewtonsoftJsonSerializer.Default);
+            client.AddHandler(() => NewtonsoftJsonSerializer.Default,"application/json");
 
             var request = !string.IsNullOrEmpty(nameLookup)
                 ? new RestRequest($"/companies/search?q={nameLookup}", Method.GET) // This will return a sparse company result
                 : new RestRequest($"companies/{jurisdictionCodeLookup.Jurisdiction}/{jurisdictionCodeLookup.Value}?format=json", Method.GET);
 
-            var response = client.ExecuteTaskAsync<OpenCorporatesResponse>(request).Result;
+            var response = client.ExecuteAsync<OpenCorporatesResponse>(request).Result;
 
             switch (response.StatusCode)
             {
@@ -295,7 +296,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                             break;
 
                         default:
-                            context.Log.Warn(new { data }, () => "Unknown OpenCorporates data type: " + data.Key);
+                            context.Log.LogWarning("Unknown OpenCorporates data type: Key: {Key} - Data: {@Data}", data.Key, new { data });
                             break;
                     }
                 }
