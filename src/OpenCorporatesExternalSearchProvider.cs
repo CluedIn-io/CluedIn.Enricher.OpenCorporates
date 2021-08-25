@@ -305,7 +305,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             metadata.Codes.Add(code);
         }
 
-        public string Icon { get; } = "Resources.opencorporates.png";
+        public string Icon { get; } = "Resources.opencorporates.svg";
         public string Domain { get; } = "https://opencorporates.com/";
         public string About { get; } = "Open Corporates is an enricher which provides information on all companies worldwide";
         public AuthMethods AuthMethods { get; }
