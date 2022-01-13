@@ -43,6 +43,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{17EE3C8D-BAE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.OpenCorporates", "src\ExternalSearch.Providers.OpenCorporates\ExternalSearch.Providers.OpenCorporates.csproj", "{118753A6-2CA0-4704-930C-BB2AA6CC3391}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.OpenCorporates.Provider", "src\ExternalSearch.Providers.OpenCorporates.Provider\ExternalSearch.Providers.OpenCorporates.Provider.csproj", "{2E745504-AAE5-4373-B926-A8E548348A80}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{118753A6-2CA0-4704-930C-BB2AA6CC3391}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{118753A6-2CA0-4704-930C-BB2AA6CC3391}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{118753A6-2CA0-4704-930C-BB2AA6CC3391}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2E745504-AAE5-4373-B926-A8E548348A80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2E745504-AAE5-4373-B926-A8E548348A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2E745504-AAE5-4373-B926-A8E548348A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2E745504-AAE5-4373-B926-A8E548348A80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -66,6 +72,7 @@ Global
 		{2C3AECCF-DCB5-4ED7-8B7B-8F373EDE3A5E} = {9BD54E81-D9C8-4419-82B8-8EE6CC7E2647}
 		{17EE3C8D-BAE4-481A-B9CC-1BE878E86124} = {9BD54E81-D9C8-4419-82B8-8EE6CC7E2647}
 		{118753A6-2CA0-4704-930C-BB2AA6CC3391} = {B2A52533-7FBF-41FE-A0AF-874FC54300B2}
+		{2E745504-AAE5-4373-B926-A8E548348A80} = {B2A52533-7FBF-41FE-A0AF-874FC54300B2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6A61CB42-80C5-4A83-AC3E-DA41FC875525}
