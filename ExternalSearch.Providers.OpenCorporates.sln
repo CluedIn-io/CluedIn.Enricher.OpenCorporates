@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Git", "Git", "{17EE3C8D-BAE
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.OpenCorporates", "src\ExternalSearch.Providers.OpenCorporates\ExternalSearch.Providers.OpenCorporates.csproj", "{118753A6-2CA0-4704-930C-BB2AA6CC3391}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExternalSearch.Providers.OpenCorporates.Provider", "src\ExternalSearch.Providers.OpenCorporates.Provider\ExternalSearch.Providers.OpenCorporates.Provider.csproj", "{2E745504-AAE5-4373-B926-A8E548348A80}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Provider.ExternalSearch.OpenCorporates", "src\ExternalSearch.Providers.OpenCorporates.Provider\Provider.ExternalSearch.OpenCorporates.csproj", "{2E745504-AAE5-4373-B926-A8E548348A80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
