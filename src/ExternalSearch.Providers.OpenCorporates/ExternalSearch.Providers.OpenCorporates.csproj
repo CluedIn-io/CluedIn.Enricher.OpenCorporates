@@ -5,6 +5,7 @@
    <ItemGroup>
      <EmbeddedResource Include="Resources\opencorporates.svg" />
    </ItemGroup>
+
    <ItemGroup>
     <PackageReference Include="CluedIn.Core" />
     <PackageReference Include="CluedIn.ExternalSearch" />
