@@ -7,14 +7,15 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
     {
         public OpenCorporatesExternalSearchJobData(IDictionary<string, object> configuration)
         {
-           
+            TargetApiKey = GetValue<string>(configuration, nameof(TargetApiKey), default(string));
         }
 
         public IDictionary<string, object> ToDictionary()
         {
-            return new Dictionary<string, object>(
-            );
-        }
-        
+            return new Dictionary<string, object>()
+            {
+                { nameof(TargetApiKey), TargetApiKey }
+            };
+        }     
     }
 }

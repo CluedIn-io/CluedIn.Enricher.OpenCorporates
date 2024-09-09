@@ -80,8 +80,10 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             }
         }
 
-        public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query)
+        public IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query, IDictionary<string, object> config, IProvider provider)
         {
+            var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(config);
+
             var nameLookup = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Name) ? query.QueryParameters[ExternalSearchQueryParameter.Name].FirstOrDefault() : null;
 
             var jurisdictionCodeLookup = new 
@@ -99,6 +101,8 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             var request = !string.IsNullOrEmpty(nameLookup)
                 ? new RestRequest($"/companies/search?q={nameLookup}", Method.GET) // This will return a sparse company result
                 : new RestRequest($"companies/{jurisdictionCodeLookup.Jurisdiction}/{jurisdictionCodeLookup.Value}?format=json", Method.GET);
+
+            request.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
 
             var response = client.ExecuteAsync<OpenCorporatesResponse>(request).Result;
 
@@ -317,9 +321,9 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             return BuildQueries(context, request);
         }
 
-        public IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query, IDictionary<string, object> config, IProvider provider)
+        public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query)
         {
-            return ExecuteSearch(context, query);
+            throw new NotImplementedException();
         }
 
         public IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
