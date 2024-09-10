@@ -18,20 +18,18 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
-            token = new List<Control>()
+            token = new List<Control>() {
+                new()
+                {
+                    displayName = "API token",
+                    type = "password",
+                    isRequired = true,
+                    name = nameof(OpenCorporatesExternalSearchJobData.TargetApiKey)
+                } 
+            }
         };
 
-        public static IEnumerable<Control> Properties { get; set; } = new List<Control>()
-        {
-            // NOTE: Leaving this commented as an example - BF
-            //new()
-            //{
-            //    displayName = "Some Data",
-            //    type = "input",
-            //    isRequired = true,
-            //    name = "someData"
-            //}
-        };
+        public static IEnumerable<Control> Properties { get; set; } = AuthMethods.token;
 
         public static Guide Guide { get; set; } = null;
         public static IntegrationType IntegrationType { get; set; } = IntegrationType.Enrichment;
