@@ -239,7 +239,8 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             metadata.Properties[OpenCorporatesVocabulary.Filing.OpenCorporatesUrl] = filing.opencorporates_url.PrintIfAvailable();
             metadata.Properties[OpenCorporatesVocabulary.Filing.Uid]               = filing.uid.PrintIfAvailable();
 
-            if (Uri.TryCreate(filing.url.ToString(), UriKind.Absolute, out var uri))
+            var filingUrl = filing.url?.ToString();
+            if (!string.IsNullOrWhiteSpace(filingUrl) && Uri.TryCreate(filing.url.ToString(), UriKind.Absolute, out var uri))
                 metadata.Uri = uri;
 
             metadata.Codes.Add(code);
