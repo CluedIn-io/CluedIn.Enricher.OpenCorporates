@@ -242,6 +242,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             if (Uri.TryCreate(filing.url.ToString(), UriKind.Absolute, out var uri))
                 metadata.Uri = uri;
 
+            metadata.Codes.Add(code);
             metadata.OriginEntityCode = code;
 
             metadata.OutgoingEdges.Add(new EntityEdge(EntityReference.CreateByKnownCode(code), EntityReference.CreateByKnownCode(companyClue.OriginEntityCode, companyClue.Data.EntityData.Name), EntityEdgeType.Parent));
@@ -339,6 +340,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 }
             }
 
+            metadata.Codes.Add(code);
             metadata.OriginEntityCode = code;
         }
 
