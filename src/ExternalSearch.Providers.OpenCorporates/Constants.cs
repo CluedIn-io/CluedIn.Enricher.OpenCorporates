@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CluedIn.Core.Data.Relational;
 using CluedIn.Core.Providers;
 
@@ -16,6 +17,24 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public static string Icon { get; set; } = "Resources.opencorporates.svg";
         public static string Domain { get; set; } = "https://opencorporates.com/";
 
+        public static IEnumerable<Control> Properties { get; set; } = new List<Control>()
+        {
+            new()
+            {
+                displayName = "Accepted Entity Type",
+                type = "input",
+                isRequired = true,
+                name = nameof(OpenCorporatesExternalSearchJobData.AcceptedEntityType)
+            },
+            new()
+            {
+                displayName = "Lookup Vocabulary Key",
+                type = "input",
+                isRequired = true,
+                name = nameof(OpenCorporatesExternalSearchJobData.LookupVocabularyKey)
+            },
+        };
+
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
         {
             token = new List<Control>() {
@@ -25,11 +44,9 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     type = "password",
                     isRequired = true,
                     name = nameof(OpenCorporatesExternalSearchJobData.TargetApiKey)
-                } 
-            }
+                }
+            }.Concat(Properties)
         };
-
-        public static IEnumerable<Control> Properties { get; set; } = AuthMethods.token;
 
         public static Guide Guide { get; set; } = null;
         public static IntegrationType IntegrationType { get; set; } = IntegrationType.Enrichment;
