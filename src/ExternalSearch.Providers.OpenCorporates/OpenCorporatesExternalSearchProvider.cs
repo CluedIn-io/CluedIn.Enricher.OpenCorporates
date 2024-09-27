@@ -52,6 +52,12 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
         private IEnumerable<EntityType> Accepts(IDictionary<string, object> config)
         {
+            if (config != null)
+            {
+                var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(config);
+                if (!string.IsNullOrWhiteSpace(openCorporatesExternalSearchJobData.AcceptedEntityType))
+                    return new EntityType[] { openCorporatesExternalSearchJobData.AcceptedEntityType };
+            }
             // Fallback to default accepted entity types
             return DefaultAcceptedEntityTypes;
         }
@@ -77,6 +83,10 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
             var entityType = request.EntityMetaData.EntityType;
             var organizationName = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
+
+            var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(config);
+            if (!string.IsNullOrWhiteSpace(openCorporatesExternalSearchJobData.LookupVocabularyKey))
+                organizationName = request.QueryParameters.GetValue<string, HashSet<string>>(openCorporatesExternalSearchJobData.LookupVocabularyKey, new HashSet<string>());
 
             var companyCodes = OpenCorporatesUtil.GetAllCodesFromRequest(request);
 
