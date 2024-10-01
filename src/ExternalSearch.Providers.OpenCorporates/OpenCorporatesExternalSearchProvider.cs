@@ -357,11 +357,11 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
 
         // Since this is a configurable external search provider, theses methods should never be called
-        public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request) => throw new NotSupportedException();
-        public override bool Accepts(EntityType entityType) => throw new NotSupportedException();
+        public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request) => BuildQueries(context, request, null, null).AsEnumerable();
+        public override bool Accepts(EntityType entityType) => Accepts(null, entityTypeToEvaluate: null);
         public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query) => throw new NotSupportedException();
-        public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
-        public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
+        public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request) => BuildClues(context, query, result, request, null, null);
+        public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => GetPrimaryEntityMetadata(context, result, request, null, null);
 
         /**********************************************************************************************************
          * PROPERTIES
