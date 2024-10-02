@@ -52,6 +52,12 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
         private IEnumerable<EntityType> Accepts(IDictionary<string, object> config)
         {
+            if (config != null)
+            {
+                var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(config);
+                if (!string.IsNullOrWhiteSpace(openCorporatesExternalSearchJobData.AcceptedEntityType))
+                    return new EntityType[] { openCorporatesExternalSearchJobData.AcceptedEntityType };
+            }
             // Fallback to default accepted entity types
             return DefaultAcceptedEntityTypes;
         }
@@ -77,6 +83,10 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
             var entityType = request.EntityMetaData.EntityType;
             var organizationName = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
+
+            var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(config);
+            if (!string.IsNullOrWhiteSpace(openCorporatesExternalSearchJobData.LookupVocabularyKey))
+                organizationName = request.QueryParameters.GetValue<string, HashSet<string>>(openCorporatesExternalSearchJobData.LookupVocabularyKey, new HashSet<string>());
 
             var companyCodes = OpenCorporatesUtil.GetAllCodesFromRequest(request);
 
@@ -179,7 +189,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
             clue.Data.OriginProviderDefinitionId = this.Id;
 
-            this.PopulateMetadata(context, clue.Data.EntityData, resultItem);
+            this.PopulateMetadata(context, clue.Data.EntityData, resultItem, request);
 
             yield return clue;
 
@@ -203,7 +213,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<FullCompanyObject>();
-            return this.CreateMetadata(context, resultItem);
+            return this.CreateMetadata(context, resultItem, request);
         }
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
@@ -239,32 +249,36 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             metadata.Properties[OpenCorporatesVocabulary.Filing.OpenCorporatesUrl] = filing.opencorporates_url.PrintIfAvailable();
             metadata.Properties[OpenCorporatesVocabulary.Filing.Uid]               = filing.uid.PrintIfAvailable();
 
-            if (Uri.TryCreate(filing.url.ToString(), UriKind.Absolute, out var uri))
+            var filingUrl = filing.url?.ToString();
+            if (!string.IsNullOrWhiteSpace(filingUrl) && Uri.TryCreate(filing.url.ToString(), UriKind.Absolute, out var uri))
                 metadata.Uri = uri;
 
             metadata.Codes.Add(code);
+            metadata.OriginEntityCode = code;
 
             metadata.OutgoingEdges.Add(new EntityEdge(EntityReference.CreateByKnownCode(code), EntityReference.CreateByKnownCode(companyClue.OriginEntityCode, companyClue.Data.EntityData.Name), EntityEdgeType.Parent));
         }
 
-        private IEntityMetadata CreateMetadata(ExecutionContext context, IExternalSearchQueryResult<FullCompanyObject> resultItem)
+        private IEntityMetadata CreateMetadata(ExecutionContext context, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request)
         {
             var metadata = new EntityMetadataPart();
 
-            this.PopulateMetadata(context, metadata, resultItem);
+            this.PopulateMetadata(context, metadata, resultItem, request);
 
             return metadata;
         }
 
-        private void PopulateMetadata(ExecutionContext context, IEntityMetadata metadata, IExternalSearchQueryResult<FullCompanyObject> resultItem)
+        private void PopulateMetadata(ExecutionContext context, IEntityMetadata metadata, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request)
         {
             var code = new EntityCode(EntityType.Organization, CodeOrigin.CluedIn.CreateSpecific("openCorporates"), resultItem.Data.Company.company_number);
 
-            metadata.EntityType = EntityType.Organization;
+            metadata.EntityType = request.EntityMetaData.EntityType;
 
-            metadata.Name           = resultItem.Data.Company.name;
+            metadata.Name           = request.EntityMetaData.Name;
             metadata.CreatedDate    = resultItem.Data.Company.created_at;
             metadata.ModifiedDate   = resultItem.Data.Company.updated_at;
+
+            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             metadata.Aliases.AddRange(resultItem.Data.Company.alternative_names?.Where(a => !string.IsNullOrEmpty(a.company_name)).Select(p => p.company_name) ?? new string[0]);
             metadata.Aliases.AddRange(resultItem.Data.Company.previous_names?.Where(a => !string.IsNullOrEmpty(a.company_name)).Select(p => p.company_name) ?? new string[0]);
@@ -338,15 +352,16 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             }
 
             metadata.Codes.Add(code);
+            metadata.OriginEntityCode = code;
         }
 
 
         // Since this is a configurable external search provider, theses methods should never be called
-        public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request) => throw new NotSupportedException();
-        public override bool Accepts(EntityType entityType) => throw new NotSupportedException();
+        public override IEnumerable<IExternalSearchQuery> BuildQueries(ExecutionContext context, IExternalSearchRequest request) => BuildQueries(context, request, null, null).AsEnumerable();
+        public override bool Accepts(EntityType entityType) => Accepts(null, entityTypeToEvaluate: null);
         public override IEnumerable<IExternalSearchQueryResult> ExecuteSearch(ExecutionContext context, IExternalSearchQuery query) => throw new NotSupportedException();
-        public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
-        public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => throw new NotSupportedException();
+        public override IEnumerable<Clue> BuildClues(ExecutionContext context, IExternalSearchQuery query, IExternalSearchQueryResult result, IExternalSearchRequest request) => BuildClues(context, query, result, request, null, null);
+        public override IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request) => GetPrimaryEntityMetadata(context, result, request, null, null);
 
         /**********************************************************************************************************
          * PROPERTIES
