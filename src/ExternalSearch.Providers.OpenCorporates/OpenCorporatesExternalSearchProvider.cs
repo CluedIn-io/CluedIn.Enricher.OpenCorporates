@@ -183,13 +183,10 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         {
             var resultItem = result.As<FullCompanyObject>();
 
-            var code = new EntityCode(EntityType.Organization, CodeOrigin.CluedIn.CreateSpecific("openCorporates"), resultItem.Data.Company.company_number);
-
-            var clue = new Clue(code, context.Organization);
+            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization);
 
             clue.Data.OriginProviderDefinitionId = this.Id;
-
-            this.PopulateMetadata(context, clue.Data.EntityData, resultItem, request);
+            this.PopulateMetadata(context, clue.Data.EntityData, resultItem, request, config);
 
             yield return clue;
 
@@ -198,7 +195,6 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 foreach (var filing in resultItem.Data.Company.filings.Select(f => f.filing))
                 {
                     var filingCode = new EntityCode(EntityType.Activity, CodeOrigin.CluedIn.CreateSpecific("openCorporates"), filing.id);
-
                     var filingClue = new Clue(filingCode, context.Organization);
 
                     filingClue.Data.OriginProviderDefinitionId = this.Id;
@@ -213,7 +209,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<FullCompanyObject>();
-            return this.CreateMetadata(context, resultItem, request);
+            return this.CreateMetadata(context, resultItem, request, config);
         }
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
@@ -259,26 +255,22 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             metadata.OutgoingEdges.Add(new EntityEdge(EntityReference.CreateByKnownCode(code), EntityReference.CreateByKnownCode(companyClue.OriginEntityCode, companyClue.Data.EntityData.Name), EntityEdgeType.Parent));
         }
 
-        private IEntityMetadata CreateMetadata(ExecutionContext context, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request)
+        private IEntityMetadata CreateMetadata(ExecutionContext context, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
         {
             var metadata = new EntityMetadataPart();
 
-            this.PopulateMetadata(context, metadata, resultItem, request);
+            this.PopulateMetadata(context, metadata, resultItem, request, config);
 
             return metadata;
         }
 
-        private void PopulateMetadata(ExecutionContext context, IEntityMetadata metadata, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request)
+        private void PopulateMetadata(ExecutionContext context, IEntityMetadata metadata, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
         {
-            var code = new EntityCode(EntityType.Organization, CodeOrigin.CluedIn.CreateSpecific("openCorporates"), resultItem.Data.Company.company_number);
-
             metadata.EntityType = request.EntityMetaData.EntityType;
 
             metadata.Name           = request.EntityMetaData.Name;
             metadata.CreatedDate    = resultItem.Data.Company.created_at;
             metadata.ModifiedDate   = resultItem.Data.Company.updated_at;
-
-            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             metadata.Aliases.AddRange(resultItem.Data.Company.alternative_names?.Where(a => !string.IsNullOrEmpty(a.company_name)).Select(p => p.company_name) ?? new string[0]);
             metadata.Aliases.AddRange(resultItem.Data.Company.previous_names?.Where(a => !string.IsNullOrEmpty(a.company_name)).Select(p => p.company_name) ?? new string[0]);
@@ -351,8 +343,12 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 }
             }
 
-            metadata.Codes.Add(code);
-            metadata.OriginEntityCode = code;
+            var jobData = new OpenCorporatesExternalSearchJobData(config);
+            if (!jobData.SkipCompanyNumberEntityCodeCreation)
+            {
+                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, CodeOrigin.CluedIn.CreateSpecific("openCorporates"), resultItem.Data.Company.company_number));
+            }
+            metadata.OriginEntityCode = request.EntityMetaData.OriginEntityCode;
         }
 
 

@@ -33,6 +33,13 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 isRequired = true,
                 name = nameof(OpenCorporatesExternalSearchJobData.LookupVocabularyKey)
             },
+            new()
+            {
+                displayName = "Skip Entity Code Creation (Company Number)",
+                type = "checkbox",
+                isRequired = false,
+                name = nameof(OpenCorporatesExternalSearchJobData.SkipCompanyNumberEntityCodeCreation)
+            }
         };
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
