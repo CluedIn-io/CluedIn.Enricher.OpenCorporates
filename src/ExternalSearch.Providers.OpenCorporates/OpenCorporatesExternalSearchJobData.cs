@@ -10,6 +10,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             TargetApiKey = GetValue<string>(configuration, nameof(TargetApiKey), default(string));
             AcceptedEntityType = GetValue(configuration, nameof(AcceptedEntityType), default(string));
             LookupVocabularyKey = GetValue<string>(configuration, nameof(LookupVocabularyKey), default(string));
+            SkipCompanyNumberEntityCodeCreation = GetValue(configuration, nameof(SkipCompanyNumberEntityCodeCreation), default(bool));
         }
 
         public IDictionary<string, object> ToDictionary()
@@ -19,10 +20,12 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 { nameof(TargetApiKey), TargetApiKey },
                 { nameof(AcceptedEntityType), AcceptedEntityType },
                 { nameof(LookupVocabularyKey), LookupVocabularyKey },
+                { nameof(SkipCompanyNumberEntityCodeCreation), SkipCompanyNumberEntityCodeCreation },
             };
         }     
 
         public string AcceptedEntityType { get; set; }
         public string LookupVocabularyKey { get; set; }
+        public bool SkipCompanyNumberEntityCodeCreation { get; set; }
     }
 }
