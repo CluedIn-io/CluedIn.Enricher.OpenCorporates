@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CluedIn.Core.Crawling;
+using static CluedIn.ExternalSearch.Providers.OpenCorporates.Constants;
 
 namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 {
@@ -8,9 +9,9 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public OpenCorporatesExternalSearchJobData(IDictionary<string, object> configuration)
         {
             TargetApiKey = GetValue<string>(configuration, nameof(TargetApiKey), default(string));
-            AcceptedEntityType = GetValue(configuration, nameof(AcceptedEntityType), default(string));
-            LookupVocabularyKey = GetValue<string>(configuration, nameof(LookupVocabularyKey), default(string));
-            SkipCompanyNumberEntityCodeCreation = GetValue(configuration, nameof(SkipCompanyNumberEntityCodeCreation), default(bool));
+            AcceptedEntityType = GetValue(configuration, KeyName.AcceptedEntityType, default(string));
+            LookupVocabularyKey = GetValue<string>(configuration, KeyName.LookupVocabularyKey, default(string));
+            SkipCompanyNumberEntityCodeCreation = GetValue(configuration, KeyName.SkipCompanyNumberEntityCodeCreation, default(bool));
         }
 
         public IDictionary<string, object> ToDictionary()
@@ -18,9 +19,9 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             return new Dictionary<string, object>()
             {
                 { nameof(TargetApiKey), TargetApiKey },
-                { nameof(AcceptedEntityType), AcceptedEntityType },
-                { nameof(LookupVocabularyKey), LookupVocabularyKey },
-                { nameof(SkipCompanyNumberEntityCodeCreation), SkipCompanyNumberEntityCodeCreation },
+                { KeyName.AcceptedEntityType, AcceptedEntityType },
+                { KeyName.LookupVocabularyKey, LookupVocabularyKey },
+                { KeyName.SkipCompanyNumberEntityCodeCreation, SkipCompanyNumberEntityCodeCreation },
             };
         }     
 
