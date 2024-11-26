@@ -45,6 +45,14 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             ]
             """;
 
+        public struct KeyName
+        {
+            public const string TargetApiKey = "targetApiKey";
+            public const string AcceptedEntityType = "acceptedEntityType";
+            public const string LookupVocabularyKey = "lookupVocabularyKey";
+            public const string SkipCompanyNumberEntityCodeCreation = "skipCompanyNumberEntityCodeCreation";
+        }
+
         public static string About { get; set; } = "Open Corporates is an enricher which provides information on all companies worldwide";
         public static string Icon { get; set; } = "Resources.opencorporates.svg";
         public static string Domain { get; set; } = "https://opencorporates.com/";
@@ -54,17 +62,17 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             new()
             {
                 DisplayName = "Accepted Entity Type",
-                Type = "input",
+                Type = "entityTypeSelector",
                 IsRequired = true,
-                Name = nameof(OpenCorporatesExternalSearchJobData.AcceptedEntityType),
+                Name = KeyName.AcceptedEntityType,
                 Help = "The entity type that defines the golden records you want to enrich. (e.g., /Organization)."
             },
             new()
             {
                 DisplayName = "Lookup Vocabulary Key",
-                Type = "input",
+                Type = "vocabularyKeySelector",
                 IsRequired = true,
-                Name = nameof(OpenCorporatesExternalSearchJobData.LookupVocabularyKey),
+                Name = KeyName.LookupVocabularyKey,
                 Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
             },
             new()
@@ -72,7 +80,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 DisplayName = "Skip Entity Code Creation (Company Number)",
                 Type = "checkbox",
                 IsRequired = false,
-                Name = nameof(OpenCorporatesExternalSearchJobData.SkipCompanyNumberEntityCodeCreation),
+                Name = KeyName.SkipCompanyNumberEntityCodeCreation,
                 Help = "Toggle to control the creation of new entity codes using the Company Number."
             }
         };
@@ -85,7 +93,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     DisplayName = "API token",
                     Type = "password",
                     IsRequired = true,
-                    Name = nameof(OpenCorporatesExternalSearchJobData.TargetApiKey),
+                    Name = KeyName.TargetApiKey,
                     Help = "The key to authenticate access to the OpenCorporates API."
                 }
             }.Concat(Properties)
