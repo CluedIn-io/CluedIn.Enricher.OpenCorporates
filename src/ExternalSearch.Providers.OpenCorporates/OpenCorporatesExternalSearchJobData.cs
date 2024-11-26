@@ -8,7 +8,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
     {
         public OpenCorporatesExternalSearchJobData(IDictionary<string, object> configuration)
         {
-            TargetApiKey = GetValue<string>(configuration, nameof(TargetApiKey), default(string));
+            TargetApiKey = GetValue<string>(configuration, KeyName.TargetApiKey, default(string));
             AcceptedEntityType = GetValue(configuration, KeyName.AcceptedEntityType, default(string));
             LookupVocabularyKey = GetValue<string>(configuration, KeyName.LookupVocabularyKey, default(string));
             SkipCompanyNumberEntityCodeCreation = GetValue(configuration, KeyName.SkipCompanyNumberEntityCodeCreation, default(bool));
@@ -18,7 +18,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         {
             return new Dictionary<string, object>()
             {
-                { nameof(TargetApiKey), TargetApiKey },
+                { KeyName.TargetApiKey, TargetApiKey },
                 { KeyName.AcceptedEntityType, AcceptedEntityType },
                 { KeyName.LookupVocabularyKey, LookupVocabularyKey },
                 { KeyName.SkipCompanyNumberEntityCodeCreation, SkipCompanyNumberEntityCodeCreation },

@@ -47,6 +47,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
         public struct KeyName
         {
+            public const string TargetApiKey = "targetApiKey";
             public const string AcceptedEntityType = "acceptedEntityType";
             public const string LookupVocabularyKey = "lookupVocabularyKey";
             public const string SkipCompanyNumberEntityCodeCreation = "skipCompanyNumberEntityCodeCreation";
@@ -92,7 +93,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     DisplayName = "API token",
                     Type = "password",
                     IsRequired = true,
-                    Name = nameof(OpenCorporatesExternalSearchJobData.TargetApiKey),
+                    Name = KeyName.TargetApiKey,
                     Help = "The key to authenticate access to the OpenCorporates API."
                 }
             }.Concat(Properties)
