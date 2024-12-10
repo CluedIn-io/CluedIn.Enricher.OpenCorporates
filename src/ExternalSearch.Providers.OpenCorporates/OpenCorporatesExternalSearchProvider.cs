@@ -29,7 +29,7 @@ using System.Text.RegularExpressions;
 
 namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 {
-    public class OpenCorporatesExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider, IExtendedEnricherMetadata2
+    public class OpenCorporatesExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider, IExternalSearchProviderWithVerifyConnection
     {
         /**********************************************************************************************************
          * FIELDS
