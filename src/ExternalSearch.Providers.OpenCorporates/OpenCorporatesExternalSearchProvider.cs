@@ -170,14 +170,14 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 case HttpStatusCode.NotFound:
                     yield break;
                 default:
-                    {
-                        if (response.ErrorException != null)
-                            throw new AggregateException(response.ErrorException.Message, response.ErrorException);
-                        else if (response.Content != null)
-                            throw new ApplicationException("Could not execute external search query - StatusCode:" + response.StatusCode + " - " + response.Content);
-                        else
-                            throw new ApplicationException("Could not execute external search query - StatusCode:" + response.StatusCode);
-                    }
+                {
+                    if (response.ErrorException != null)
+                        throw new AggregateException(response.ErrorException.Message, response.ErrorException);
+                    else if (response.Content != null)
+                        throw new ApplicationException("Could not execute external search query - StatusCode:" + response.StatusCode + " - " + response.Content);
+                    else
+                        throw new ApplicationException("Could not execute external search query - StatusCode:" + response.StatusCode);
+                }
             }
         }
 
