@@ -90,7 +90,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             Token = new List<Control>() {
                 new()
                 {
-                    DisplayName = "API token",
+                    DisplayName = "API Key",
                     Type = "password",
                     IsRequired = true,
                     Name = KeyName.TargetApiKey,
