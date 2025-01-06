@@ -94,7 +94,14 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     Type = "password",
                     IsRequired = true,
                     Name = KeyName.TargetApiKey,
-                    Help = "The key to authenticate access to the OpenCorporates API."
+                    Help = "The key to authenticate access to the OpenCorporates API.",
+                    ValidationRules = new List<Dictionary<string, string>>()
+                    {
+                        new() {
+                            { "regex", "\\s" },
+                            { "message", "Spaces are not allowed" }
+                        }
+                    },
                 }
             }.Concat(Properties)
         };
