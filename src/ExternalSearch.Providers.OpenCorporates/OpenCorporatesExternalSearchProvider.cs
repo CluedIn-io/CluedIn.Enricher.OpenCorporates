@@ -129,7 +129,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 yield break;
 
             var client = new RestClient("https://api.opencorporates.com/v0.4");
-            client.AddHandler(() => NewtonsoftJsonSerializer.Default, "application/json");
+            client.AddHandler("application/json", () => NewtonsoftJsonSerializer.Default);
 
             var request = !string.IsNullOrEmpty(nameLookup)
                 ? new RestRequest($"/companies/search?q={nameLookup}", Method.GET) // This will return a sparse company result
@@ -234,7 +234,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(configDict);
 
             var client = new RestClient("https://api.opencorporates.com/v0.4");
-            client.AddHandler(() => NewtonsoftJsonSerializer.Default, "application/json");
+            client.AddHandler("application/json", () => NewtonsoftJsonSerializer.Default);
 
             var searchCompanyRequest = new RestRequest($"/companies/search?q=Google", Method.GET);
             searchCompanyRequest.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
