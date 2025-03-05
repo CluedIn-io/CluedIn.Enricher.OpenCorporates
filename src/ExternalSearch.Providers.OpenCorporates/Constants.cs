@@ -77,11 +77,11 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             },
             new()
             {
-                DisplayName = "Skip Entity Code Creation (Company Number)",
+                DisplayName = "Skip Identifier Creation (Company Number)",
                 Type = "checkbox",
                 IsRequired = false,
                 Name = KeyName.SkipCompanyNumberEntityCodeCreation,
-                Help = "Toggle to control the creation of new entity codes using the Company Number."
+                Help = "Toggle to control the creation of new identifiers using the Company Number."
             }
         };
 
