@@ -20,7 +20,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     "type": "list-item",
                     "children": [
                       {
-                        "text": "Add the entity type to specify the golden records you want to enrich. Only golden records belonging to that entity type will be enriched."
+                        "text": "Add the business domain to specify the golden records you want to enrich. Only golden records belonging to that business domain will be enriched."
                       }
                     ]
                   },
@@ -61,11 +61,11 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         {
             new()
             {
-                DisplayName = "Accepted Entity Type",
+                DisplayName = "Accepted Business Domain",
                 Type = "entityTypeSelector",
                 IsRequired = true,
                 Name = KeyName.AcceptedEntityType,
-                Help = "The entity type that defines the golden records you want to enrich. (e.g., /Organization)."
+                Help = "The business domain that defines the golden records you want to enrich. (e.g., /Organization)."
             },
             new()
             {
@@ -77,11 +77,11 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             },
             new()
             {
-                DisplayName = "Skip Entity Code Creation (Company Number)",
+                DisplayName = "Skip Identifier Creation (Company Number)",
                 Type = "checkbox",
                 IsRequired = false,
                 Name = KeyName.SkipCompanyNumberEntityCodeCreation,
-                Help = "Toggle to control the creation of new entity codes using the Company Number."
+                Help = "Toggle to control the creation of new identifiers using the Company Number."
             }
         };
 
@@ -90,11 +90,18 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             Token = new List<Control>() {
                 new()
                 {
-                    DisplayName = "API token",
+                    DisplayName = "API Key",
                     Type = "password",
                     IsRequired = true,
                     Name = KeyName.TargetApiKey,
-                    Help = "The key to authenticate access to the OpenCorporates API."
+                    Help = "The key to authenticate access to the OpenCorporates API.",
+                    ValidationRules = new List<Dictionary<string, string>>()
+                    {
+                        new() {
+                            { "regex", "\\s" },
+                            { "message", "Spaces are not allowed" }
+                        }
+                    },
                 }
             }.Concat(Properties)
         };
