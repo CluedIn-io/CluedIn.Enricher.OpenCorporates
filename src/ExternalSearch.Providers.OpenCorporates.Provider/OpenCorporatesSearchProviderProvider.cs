@@ -120,6 +120,7 @@ namespace CluedIn.Provider.OpenCorporates
         public IEnumerable<Control> Properties { get; } = Constants.Properties;
         public Guide Guide { get; } = Constants.Guide;
         public new IntegrationType Type { get; } = Constants.IntegrationType;
+        public bool SupportsEnricherV2 => true;
         public Dictionary<string, object> ExtraInfo { get; } = new Dictionary<string, object>
         {
             { "autoMap", true },
