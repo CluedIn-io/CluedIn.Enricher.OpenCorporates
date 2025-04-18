@@ -50,7 +50,6 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             public const string TargetApiKey = "targetApiKey";
             public const string AcceptedEntityType = "acceptedEntityType";
             public const string LookupVocabularyKey = "lookupVocabularyKey";
-            public const string SkipCompanyNumberEntityCodeCreation = "skipCompanyNumberEntityCodeCreation";
         }
 
         public static string About { get; set; } = "Open Corporates is an enricher which provides information on all companies worldwide";
@@ -75,14 +74,6 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 Name = KeyName.LookupVocabularyKey,
                 Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
             },
-            new()
-            {
-                DisplayName = $"Skip {Core.Constants.DomainLabels.EntityCode} Creation (Company Number)",
-                Type = "checkbox",
-                IsRequired = false,
-                Name = KeyName.SkipCompanyNumberEntityCodeCreation,
-                Help = $"Toggle to control the creation of new {Core.Constants.DomainLabels.EntityCodes.ToLower()} using the Company Number."
-            }
         };
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
