@@ -24,10 +24,12 @@ using CluedIn.Crawling.Helpers;
 using Microsoft.Extensions.Logging;
 using EntityType = CluedIn.Core.Data.EntityType;
 using CluedIn.ExternalSearch.Provider;
+using CluedIn.Core.Connectors;
+using System.Text.RegularExpressions;
 
 namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 {
-    public class OpenCorporatesExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider
+    public class OpenCorporatesExternalSearchProvider : ExternalSearchProviderBase, IExtendedEnricherMetadata, IConfigurableExternalSearchProvider, IExternalSearchProviderWithVerifyConnection
     {
         /**********************************************************************************************************
          * FIELDS
@@ -117,17 +119,17 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 
             var nameLookup = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Name) ? query.QueryParameters[ExternalSearchQueryParameter.Name].FirstOrDefault() : null;
 
-            var jurisdictionCodeLookup = new 
+            var jurisdictionCodeLookup = new
             {
                 Jurisdiction = query.QueryParameters.ContainsKey("jurisdiction") ? query.QueryParameters["jurisdiction"].FirstOrDefault() : null,
-                Value        = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Identifier.ToString()) ? query.QueryParameters[ExternalSearchQueryParameter.Identifier.ToString()].FirstOrDefault() : null
+                Value = query.QueryParameters.ContainsKey(ExternalSearchQueryParameter.Identifier.ToString()) ? query.QueryParameters[ExternalSearchQueryParameter.Identifier.ToString()].FirstOrDefault() : null
             };
 
             if (nameLookup == null && jurisdictionCodeLookup.Value == null)
                 yield break;
 
             var client = new RestClient("https://api.opencorporates.com/v0.4");
-            client.AddHandler(() => NewtonsoftJsonSerializer.Default,"application/json");
+            client.AddHandler("application/json", () => NewtonsoftJsonSerializer.Default);
 
             var request = !string.IsNullOrEmpty(nameLookup)
                 ? new RestRequest($"/companies/search?q={nameLookup}", Method.GET) // This will return a sparse company result
@@ -140,30 +142,30 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             switch (response.StatusCode)
             {
                 case HttpStatusCode.OK:
-                {
-                    if (response.Data != null)
                     {
-                        List<FullCompanyObject> results;
-
-                        if (response.Data.results.company != null)
+                        if (response.Data != null)
                         {
-                            var fullOpenCorporateObject = new FullCompanyObject { Company = response.Data.results.company };
+                            List<FullCompanyObject> results;
 
-                            results = new List<FullCompanyObject>() { fullOpenCorporateObject };
-                        }
-                        else
-                        {
-                            results = response.Data.results.companies.Select(c => new FullCompanyObject { Company = c.company }).ToList();
+                            if (response.Data.results.company != null)
+                            {
+                                var fullOpenCorporateObject = new FullCompanyObject { Company = response.Data.results.company };
+
+                                results = new List<FullCompanyObject>() { fullOpenCorporateObject };
+                            }
+                            else
+                            {
+                                results = response.Data.results.companies.Select(c => new FullCompanyObject { Company = c.company }).ToList();
+                            }
+
+                            foreach (var fullOpenCorporateObject in results)
+                            {
+                                yield return new ExternalSearchQueryResult<FullCompanyObject>(query, fullOpenCorporateObject);
+                            }
                         }
 
-                        foreach (var fullOpenCorporateObject in results)
-                        {
-                            yield return new ExternalSearchQueryResult<FullCompanyObject>(query, fullOpenCorporateObject);
-                        }
+                        break;
                     }
-
-                    break;
-                }
                 case HttpStatusCode.NoContent:
                 case HttpStatusCode.NotFound:
                     yield break;
@@ -183,10 +185,16 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         {
             var resultItem = result.As<FullCompanyObject>();
 
-            var clue = new Clue(request.EntityMetaData.OriginEntityCode, context.Organization);
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, "openCorporates", resultItem.Data.Company.company_number);
+            var clue = new Clue(code, context.Organization)
+            {
+                Data =
+                {
+                    OriginProviderDefinitionId = Id
+                }
+            };
 
-            clue.Data.OriginProviderDefinitionId = this.Id;
-            this.PopulateMetadata(context, clue.Data.EntityData, resultItem, request, config);
+            this.PopulateMetadata(context, clue.Data.EntityData, resultItem, request);
 
             yield return clue;
 
@@ -209,13 +217,13 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public IEntityMetadata GetPrimaryEntityMetadata(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             var resultItem = result.As<FullCompanyObject>();
-            return this.CreateMetadata(context, resultItem, request, config);
+            return this.CreateMetadata(context, resultItem, request);
         }
 
         public override IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request)
         {
             // Note: This needs to be cleaned up, but since config and provider is not used in GetPrimaryEntityMetadata this is fine.
-            var dummyConfig   = new Dictionary<string, object>();
+            var dummyConfig = new Dictionary<string, object>();
             var dummyProvider = new DefaultExternalSearchProviderProvider(context.ApplicationContext, this);
 
             return GetPrimaryEntityPreviewImage(context, result, request, dummyConfig, dummyProvider);
@@ -224,6 +232,49 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public IPreviewImage GetPrimaryEntityPreviewImage(ExecutionContext context, IExternalSearchQueryResult result, IExternalSearchRequest request, IDictionary<string, object> config, IProvider provider)
         {
             return null;
+        }
+
+        public ConnectionVerificationResult VerifyConnection(ExecutionContext context, IReadOnlyDictionary<string, object> config)
+        {
+            IDictionary<string, object> configDict = config.ToDictionary(entry => entry.Key, entry => entry.Value);
+            var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(configDict);
+
+            var client = new RestClient("https://api.opencorporates.com/v0.4");
+            client.AddHandler("application/json", () => NewtonsoftJsonSerializer.Default);
+
+            var searchCompanyRequest = new RestRequest($"/companies/search?q=Google", Method.GET);
+            searchCompanyRequest.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
+            var searchCompanyResponse = client.ExecuteAsync<OpenCorporatesResponse>(searchCompanyRequest).Result;
+            var searchCompanyTestConnectionResult = ConstructVerifyConnectionResponse(searchCompanyResponse);
+
+            if (!searchCompanyTestConnectionResult.Success)
+                return searchCompanyTestConnectionResult;
+
+            var searchDetailRequest = new RestRequest($"companies/bo/00198057?format=json", Method.GET);
+            searchDetailRequest.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
+            var searchDetailResponse = client.ExecuteAsync<OpenCorporatesResponse>(searchDetailRequest).Result;
+
+            return ConstructVerifyConnectionResponse(searchDetailResponse);
+        }
+
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+        {
+            var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
+            if (response.ErrorException != null)
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} {(!string.IsNullOrWhiteSpace(response.ErrorException.Message) ? response.ErrorException.Message : "This could be due to breaking changes in the external system")}.");
+
+            if (response.StatusCode is HttpStatusCode.Unauthorized)
+                return new ConnectionVerificationResult(false, $"{errorMessageBase} This could be due to invalid API key.");
+
+            var regex = new Regex(@"\<(html|head|body|div|span|img|p\>|a href)", RegexOptions.IgnoreCase | RegexOptions.Singleline | RegexOptions.IgnorePatternWhitespace);
+            var isHtml = regex.IsMatch(response.Content);
+
+            var errorMessage = response.IsSuccessful ? string.Empty
+                : string.IsNullOrWhiteSpace(response.Content) || isHtml
+                    ? $"{errorMessageBase} This could be due to breaking changes in the external system."
+                    : $"{errorMessageBase} {response.Content}.";
+
+            return new ConnectionVerificationResult(response.IsSuccessful, errorMessage);
         }
 
         private void PopulateMetadata(IEntityMetadataPart metadata, Filing filing, Clue companyClue)
@@ -255,22 +306,25 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             metadata.OutgoingEdges.Add(new EntityEdge(EntityReference.CreateByKnownCode(code), EntityReference.CreateByKnownCode(companyClue.OriginEntityCode, companyClue.Data.EntityData.Name), EntityEdgeType.Parent));
         }
 
-        private IEntityMetadata CreateMetadata(ExecutionContext context, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private IEntityMetadata CreateMetadata(ExecutionContext context, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request)
         {
             var metadata = new EntityMetadataPart();
 
-            this.PopulateMetadata(context, metadata, resultItem, request, config);
+            this.PopulateMetadata(context, metadata, resultItem, request);
 
             return metadata;
         }
 
-        private void PopulateMetadata(ExecutionContext context, IEntityMetadata metadata, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request, IDictionary<string, object> config)
+        private void PopulateMetadata(ExecutionContext context, IEntityMetadata metadata, IExternalSearchQueryResult<FullCompanyObject> resultItem, IExternalSearchRequest request)
         {
+            var code = new EntityCode(request.EntityMetaData.OriginEntityCode.Type, "openCorporates", resultItem.Data.Company.company_number);
             metadata.EntityType = request.EntityMetaData.EntityType;
 
             metadata.Name           = request.EntityMetaData.Name;
             metadata.CreatedDate    = resultItem.Data.Company.created_at;
             metadata.ModifiedDate   = resultItem.Data.Company.updated_at;
+            metadata.OriginEntityCode = code;
+            metadata.Codes.Add(request.EntityMetaData.OriginEntityCode);
 
             metadata.Aliases.AddRange(resultItem.Data.Company.alternative_names?.Where(a => !string.IsNullOrEmpty(a.company_name)).Select(p => p.company_name) ?? new string[0]);
             metadata.Aliases.AddRange(resultItem.Data.Company.previous_names?.Where(a => !string.IsNullOrEmpty(a.company_name)).Select(p => p.company_name) ?? new string[0]);
@@ -342,13 +396,6 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     }
                 }
             }
-
-            var jobData = new OpenCorporatesExternalSearchJobData(config);
-            if (!jobData.SkipCompanyNumberEntityCodeCreation)
-            {
-                metadata.Codes.Add(new EntityCode(request.EntityMetaData.EntityType, CodeOrigin.CluedIn.CreateSpecific("openCorporates"), resultItem.Data.Company.company_number));
-            }
-            metadata.OriginEntityCode = request.EntityMetaData.OriginEntityCode;
         }
 
 
