@@ -11,7 +11,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         public const string ComponentName = "OpenCorporates";
         public const string ProviderName = "Open Corporates";
         public static readonly Guid ProviderId = Core.Constants.ExternalSearchProviders.OpenCorporatesId;
-        public const string Instruction = """
+        public static readonly string Instruction = $$"""
             [
               {
                 "type": "bulleted-list",
@@ -20,7 +20,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                     "type": "list-item",
                     "children": [
                       {
-                        "text": "Add the business domain to specify the golden records you want to enrich. Only golden records belonging to that business domain will be enriched."
+                        "text": "Add the {{Core.Constants.DomainLabels.EntityType.ToLower()}} to specify the golden records you want to enrich. Only golden records belonging to that {{Core.Constants.DomainLabels.EntityType.ToLower()}} will be enriched."
                       }
                     ]
                   },
@@ -50,7 +50,6 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             public const string TargetApiKey = "targetApiKey";
             public const string AcceptedEntityType = "acceptedEntityType";
             public const string LookupVocabularyKey = "lookupVocabularyKey";
-            public const string SkipCompanyNumberEntityCodeCreation = "skipCompanyNumberEntityCodeCreation";
         }
 
         public static string About { get; set; } = "Open Corporates is an enricher which provides information on all companies worldwide";
@@ -61,11 +60,11 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
         {
             new()
             {
-                DisplayName = "Accepted Business Domain",
+                DisplayName = $"Accepted {Core.Constants.DomainLabels.EntityType}",
                 Type = "entityTypeSelector",
                 IsRequired = true,
                 Name = KeyName.AcceptedEntityType,
-                Help = "The business domain that defines the golden records you want to enrich. (e.g., /Organization)."
+                Help = $"The {Core.Constants.DomainLabels.EntityType.ToLower()} that defines the golden records you want to enrich. (e.g., /Organization)."
             },
             new()
             {
@@ -75,14 +74,6 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
                 Name = KeyName.LookupVocabularyKey,
                 Help = "The vocabulary key that contains the names of companies you want to enrich (e.g., organization.name)."
             },
-            new()
-            {
-                DisplayName = "Skip Identifier Creation (Company Number)",
-                Type = "checkbox",
-                IsRequired = false,
-                Name = KeyName.SkipCompanyNumberEntityCodeCreation,
-                Help = "Toggle to control the creation of new identifiers using the Company Number."
-            }
         };
 
         public static AuthMethods AuthMethods { get; set; } = new AuthMethods
