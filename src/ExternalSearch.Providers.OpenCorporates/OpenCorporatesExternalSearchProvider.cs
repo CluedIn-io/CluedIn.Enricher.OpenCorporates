@@ -84,6 +84,7 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             }
 
             var entityType = request.EntityMetaData.EntityType;
+            var entityName = !string.IsNullOrEmpty(request.EntityMetaData.Name) ? request.EntityMetaData.Name : request.EntityMetaData.DisplayName;
             var organizationName = request.QueryParameters.GetValue(CluedIn.Core.Data.Vocabularies.Vocabularies.CluedInOrganization.OrganizationName, new HashSet<string>());
 
             var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(config);
@@ -110,6 +111,11 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             {
                 foreach (var value in organizationName.Where(v => !NameFilter(v)))
                     yield return new ExternalSearchQuery(this, entityType, ExternalSearchQueryParameter.Name, value);
+            }
+
+            if (!organizationName.Any())
+            {
+                throw new Exception($"Unable to generate queries for {entityName}. Name is empty.");
             }
         }
 
