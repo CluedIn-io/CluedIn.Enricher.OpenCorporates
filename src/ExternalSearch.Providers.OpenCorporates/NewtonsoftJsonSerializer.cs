@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="NewtonsoftJsonSerializer.cs" company="Clued In">
 //   Copyright (c) 2019 Clued In. All rights reserved.
 // </copyright>
@@ -11,12 +11,12 @@ using System.IO;
 
 using Newtonsoft.Json;
 
-using RestSharp.Deserializers;
+using RestSharp;
 using RestSharp.Serializers;
 
 namespace CluedIn.ExternalSearch.Providers.OpenCorporates
 {
-    public class NewtonsoftJsonSerializer : ISerializer, IDeserializer
+    public class NewtonsoftJsonSerializer : IRestSerializer, ISerializer, IDeserializer
     {
         private readonly Newtonsoft.Json.JsonSerializer serializer;
 
@@ -25,17 +25,20 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             this.serializer = serializer;
         }
 
-        public string ContentType
-        {
-            get { return "application/json"; }
-            set { }
-        }
+        public ContentType ContentType { get; set; } = ContentType.Json;
 
         public string DateFormat { get; set; }
 
         public string Namespace { get; set; }
 
         public string RootElement { get; set; }
+
+        public ISerializer Serializer => this;
+        public IDeserializer Deserializer => this;
+
+        public string[] AcceptedContentTypes => ContentType.JsonAccept;
+        public SupportsContentType SupportsContentType => contentType => contentType.Value.EndsWith("json", System.StringComparison.InvariantCultureIgnoreCase);
+        public DataFormat DataFormat => DataFormat.Json;
 
         public string Serialize(object obj)
         {
@@ -50,7 +53,9 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             }
         }
 
-        public T Deserialize<T>(RestSharp.IRestResponse response)
+        public string Serialize(Parameter parameter) => Serialize(parameter.Value);
+
+        public T Deserialize<T>(RestResponse response)
         {
             var content = response.Content;
 
