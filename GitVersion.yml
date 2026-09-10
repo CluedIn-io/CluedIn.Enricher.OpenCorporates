@@ -1,5 +1,14 @@
 mode: ContinuousDeployment
-next-version: 5.0
+# The CluedIn version is now encoded in the published package suffix (e.g. .470/.480/.500 - see
+# crawler.build.jobs.yml), so this repo's own version no longer needs to track CluedIn. Reset to
+# 1.0. next-version alone isn't enough - GitVersion still sees the old 4.x tags in history and
+# treats them as dominant - so commits-before skips everything up to and including the highest
+# pre-existing tag (4.6.1/v4.6.1, 2026-03-18T15:03:45Z). Needed a generous margin past that
+# timestamp, not just past midnight the same/next day - a cutoff of 2026-03-19T00:00:00 (9h after
+# the tag) did NOT exclude it (GitVersion 5.9 still resolved MajorMinorPatch to 4.7.0), only
+# 2026-04-01T00:00:00 reliably did. Verified for real with the pipeline's pinned GitVersion.Tool
+# 5.9.0, not just by reasoning about the config.
+next-version: 1.0
 branches:
   master:
     mode: ContinuousDelivery
@@ -26,4 +35,5 @@ branches:
     - develop
 ignore:
   sha: []
+  commits-before: 2026-04-01T00:00:00
 

@@ -134,11 +134,20 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             if (nameLookup == null && jurisdictionCodeLookup.Value == null)
                 yield break;
 
+#if CLUEDIN_V50
             var client = new RestClient(new RestClientOptions("https://api.opencorporates.com/v0.4"), configureSerialization: s => s.UseSerializer(() => NewtonsoftJsonSerializer.Default));
+#else
+            var client = new RestClient("https://api.opencorporates.com/v0.4").UseSerializer(() => NewtonsoftJsonSerializer.Default);
+#endif
 
             var request = !string.IsNullOrEmpty(nameLookup)
+#if CLUEDIN_V50
                 ? new RestRequest($"/companies/search?q={nameLookup}", Method.Get) // This will return a sparse company result
                 : new RestRequest($"companies/{jurisdictionCodeLookup.Jurisdiction}/{jurisdictionCodeLookup.Value}?format=json", Method.Get);
+#else
+                ? new RestRequest($"/companies/search?q={nameLookup}", Method.GET) // This will return a sparse company result
+                : new RestRequest($"companies/{jurisdictionCodeLookup.Jurisdiction}/{jurisdictionCodeLookup.Value}?format=json", Method.GET);
+#endif
 
             request.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
 
@@ -244,9 +253,17 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             IDictionary<string, object> configDict = config.ToDictionary(entry => entry.Key, entry => entry.Value);
             var openCorporatesExternalSearchJobData = new OpenCorporatesExternalSearchJobData(configDict);
 
+#if CLUEDIN_V50
             var client = new RestClient(new RestClientOptions("https://api.opencorporates.com/v0.4"), configureSerialization: s => s.UseSerializer(() => NewtonsoftJsonSerializer.Default));
+#else
+            var client = new RestClient("https://api.opencorporates.com/v0.4").UseSerializer(() => NewtonsoftJsonSerializer.Default);
+#endif
 
+#if CLUEDIN_V50
             var searchCompanyRequest = new RestRequest($"/companies/search?q=Google", Method.Get);
+#else
+            var searchCompanyRequest = new RestRequest($"/companies/search?q=Google", Method.GET);
+#endif
             searchCompanyRequest.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
             var searchCompanyResponse = client.ExecuteAsync<OpenCorporatesResponse>(searchCompanyRequest).Result;
             var searchCompanyTestConnectionResult = ConstructVerifyConnectionResponse(searchCompanyResponse);
@@ -254,14 +271,22 @@ namespace CluedIn.ExternalSearch.Providers.OpenCorporates
             if (!searchCompanyTestConnectionResult.Success)
                 return searchCompanyTestConnectionResult;
 
+#if CLUEDIN_V50
             var searchDetailRequest = new RestRequest($"companies/bo/00198057?format=json", Method.Get);
+#else
+            var searchDetailRequest = new RestRequest($"companies/bo/00198057?format=json", Method.GET);
+#endif
             searchDetailRequest.AddQueryParameter("api_token", openCorporatesExternalSearchJobData.TargetApiKey);
             var searchDetailResponse = client.ExecuteAsync<OpenCorporatesResponse>(searchDetailRequest).Result;
 
             return ConstructVerifyConnectionResponse(searchDetailResponse);
         }
 
+#if CLUEDIN_V50
         private ConnectionVerificationResult ConstructVerifyConnectionResponse(RestResponse response)
+#else
+        private ConnectionVerificationResult ConstructVerifyConnectionResponse(IRestResponse response)
+#endif
         {
             var errorMessageBase = $"{Constants.ProviderName} returned \"{(int)response.StatusCode} {response.StatusDescription}\".";
             if (response.ErrorException != null)
