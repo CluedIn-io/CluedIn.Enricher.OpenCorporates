@@ -139,7 +139,23 @@ real pinned tool rather than trusting the config alone.
 
 ## Step 7 — Push and confirm CI
 
-Status: **In progress** - see checklist below for latest.
+Status: **Done**
+
+PR #39, build 151865 — fully green on the first push: all three `Multi-version build+test` legs
+(4.7.0, 4.8.0, 5.0.0-beta.*) and `Multi-version: publish` passed.
+
+**Cross-repo warning received mid-migration (from the coordinator, relayed from the
+`CluedIn.Enricher.Gleif` migration running in the same batch):** `GitVersion.Tool 5.9.0` appears to
+parse `ignore.commits-before` using local machine time, not UTC, and fails **silently** - it just
+keeps incrementing off the old highest tag instead of resetting to `1.0.0`, with no error and a
+green CI build (a wrong version number doesn't fail the build, it just publishes under the wrong
+one). This matches what Step 6 above already found independently for this repo (a 9-hour-after-tag
+cutoff silently failed; only a ~2-week margin worked). Re-verified after the CI run, not just
+during Step 6: ran the pinned tool again and confirmed `MajorMinorPatch` is still `1.0.0` /
+`SemVer` is `1.0.0-multi-version-targeting.93`. **Recommendation for the remaining repos in this
+batch:** always pad `commits-before` by at least 2 full days past the highest tag's actual commit
+date, and always explicitly check the resolved `MajorMinorPatch` (not just that the config file
+"looks right" or that CI is green) before trusting it.
 
 ---
 
@@ -150,5 +166,5 @@ Status: **In progress** - see checklist below for latest.
 - [x] `Packages.props` — `_CluedIn` guarded
 - [x] `NuGet.config` — renamed from `Nuget.config`; verified sufficient as-is, no extra feed needed
 - [x] Source — RestSharp 106↔114 serializer break fixed (`NewtonsoftJsonSerializer.cs` full `#if` split; `RestClient` construction, `Method.Get`/`GET`, and `ConstructVerifyConnectionResponse` parameter type guarded in `OpenCorporatesExternalSearchProvider.cs`); all three legs build 0 errors
-- [x] `GitVersion.yml` — `next-version: 1.0`; `ignore.commits-before: 2026-04-01T00:00:00` (widened after a too-tight cutoff failed); verified with the pipeline's actual pinned GitVersion.Tool 5.9.0
-- [ ] Push branch and confirm the actual Azure DevOps pipeline run is green end-to-end (all legs + `Multi-version: publish`)
+- [x] `GitVersion.yml` — `next-version: 1.0`; `ignore.commits-before: 2026-04-01T00:00:00` (widened after a too-tight cutoff failed); verified with the pipeline's actual pinned GitVersion.Tool 5.9.0, both before and after the CI run
+- [x] Pushed branch and confirmed the Azure DevOps pipeline is green end-to-end — PR #39, build 151865: all three legs + `Multi-version: publish` passed
