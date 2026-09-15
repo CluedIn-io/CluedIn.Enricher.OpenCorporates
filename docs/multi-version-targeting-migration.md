@@ -168,3 +168,23 @@ date, and always explicitly check the resolved `MajorMinorPatch` (not just that 
 - [x] Source — RestSharp 106↔114 serializer break fixed (`NewtonsoftJsonSerializer.cs` full `#if` split; `RestClient` construction, `Method.Get`/`GET`, and `ConstructVerifyConnectionResponse` parameter type guarded in `OpenCorporatesExternalSearchProvider.cs`); all three legs build 0 errors
 - [x] `GitVersion.yml` — `next-version: 1.0`; `ignore.commits-before: 2026-04-01T00:00:00` (widened after a too-tight cutoff failed); verified with the pipeline's actual pinned GitVersion.Tool 5.9.0, both before and after the CI run
 - [x] Pushed branch and confirmed the Azure DevOps pipeline is green end-to-end — PR #39, build 151865: all three legs + `Multi-version: publish` passed
+
+---
+
+## Addendum — version baseline moved from 1.0.0 to 100.0.0
+
+Status: **Done**
+
+The CluedIn version is now carried entirely by the package suffix (`.470`/`.480`/`.500`), not by
+this repo's own `next-version` number, so that number moved again, from `1.0` to `100.0`. Reason:
+repos that were previously at 4.x/5.x under the old single-version-targeting scheme would appear to
+"go backwards" if their next version showed as `1.0.0` — `100.0.0` is unambiguously higher than any
+prior single-version release number this repo ever had.
+
+Unlike the original `1.0` reset, no `commits-before`/`ignore` trick is needed this time:
+`next-version` only needs help overriding an existing tag when the configured value is *lower* than
+that tag, and `100.0` is already higher than every pre-existing tag here. Removed the
+`ignore.commits-before` line entirely (kept `ignore.sha: []`).
+
+Verified with a real local `dotnet-gitversion` run: `MajorMinorPatch` resolves to `"100.0.0"`.
+`docs/1.0.0-release-notes.md` renamed to `docs/100.0.0-release-notes.md`.
