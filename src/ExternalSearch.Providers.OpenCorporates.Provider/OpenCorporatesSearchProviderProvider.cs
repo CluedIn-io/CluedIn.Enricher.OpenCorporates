@@ -134,6 +134,7 @@ namespace CluedIn.Provider.OpenCorporates
             { "vocabKeyPrefix", OpenCorporatesVocabulary.Organization.KeyPrefix },
             { "autoSubmission", false },
             { "dataSourceSetId", string.Empty },
+            { "fieldGroups", Constants.FieldGroups }, // for UI
         };
     }
 }
